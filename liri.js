@@ -6,7 +6,9 @@ const axios = require("axios");
 
 const keys = require("./keys");
 
-// const spotify = Spotify(keys.spotify);
+const Spotify = require("node-spotify-api");
+
+const spotify = new Spotify(keys.spotify);
 
 const command = process.argv[2];
 
@@ -23,7 +25,7 @@ switch (command) {
         break;
 
     case "spotify-this-song":
-
+        spotifyThisSong(input);
         break;
 
     case "movie-this":
@@ -36,7 +38,7 @@ switch (command) {
 
     default:
         console.log("Please type a command followed by your input");
-        console.logo("Commands: concert-this spotify-this-song movie-this do-what-it-says");
+        console.log("Commands: concert-this spotify-this-song movie-this do-what-it-says");
         break;
 }
 
@@ -46,15 +48,14 @@ function concertThis(input) {
         console.log("Please enter a band to search");
     } else {
         axios.get(`https://rest.bandsintown.com/artists/${input}/events?app_id=codingbootcamp`).then(function (response) {
-            // console.log(response.data[0]);
-            const data = response;
-            console.log(data)
 
-            // for (let i = 0; i < data.length; i++); {
-                console.log(`Venue: ${data[i].venue.name}`);
-                console.log(`Location: ${data[i].venue.city}, ${data[i].venue.region}`)
-                console.log(`Date: ${data[i].datetime}`)
-            // }
+            const data = response.data;
+            for (let key in data) {
+                console.log(`Venue: ${data[key].venue.name}`);
+                console.log(`Location: ${data[key].venue.city}, ${data[key].venue.region}`)
+                console.log(`Date: ${data[key].datetime}`)
+                console.log("////////////////////////////");
+            }
 
         }).catch(function (error) {
             if (error.response) {
@@ -75,7 +76,7 @@ function movieThis(input) {
 
     if (!input) {
         axios.get(`http://www.omdbapi.com/?t=mr+nobody&y=&plot=short&apikey=trilogy`).then(function (response) {
-            
+
             console.log(`Title: ${response.data.Title}`);
             console.log(`Release Date: ${response.data.Released}`);
             console.log(`IMDB Rating: ${response.data.Ratings[0].Value}`);
@@ -125,3 +126,29 @@ function movieThis(input) {
     };
 
 };
+
+function spotifyThisSong(input) {
+    if (!input) {
+        spotify
+            .request("https://api.spotify.com/v1/tracks/0hrBpAOgrt8RXigk83LLNE")
+            .then(function (data) {
+                console.log(`Artist: ${data.artists[0].name}`);
+                console.log(`Song: ${data.name}`);
+                console.log(`Link: ${data.external_urls.spotify}`);
+                console.log(`Album: ${data.album.name}`);
+            })
+            .catch(function (err) {
+                console.error("Error occurred: " + err);
+            })
+    } else {
+        spotify.search({ type: "track", query: input, limit: 1 }, function (err, data) {
+            if (err) {
+                throw err;
+            }
+            console.log(`Artist: ${data.tracks.items[0].artists[0].name}`);
+            console.log(`Song: ${data.tracks.items[0].name}`);
+            console.log(`Link: ${data.tracks.items[0].external_urls.spotify}`);
+            console.log(`Album: ${data.tracks.items[0].album.name}`);
+        })
+    }
+}
