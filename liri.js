@@ -1,5 +1,7 @@
 const fs = require("fs");
 
+const moment = require("moment");
+
 const dotenv = require("dotenv").config();
 
 const axios = require("axios");
@@ -50,10 +52,15 @@ function concertThis(input) {
         axios.get(`https://rest.bandsintown.com/artists/${input}/events?app_id=codingbootcamp`).then(function (response) {
 
             const data = response.data;
+
             for (let key in data) {
+
+                let date = data[key].datetime;
+                let formatDate = moment(date).utc().local().format("dddd, MMMM Do YYYY, h:mm A ");
+
                 console.log(`Venue: ${data[key].venue.name}`);
                 console.log(`Location: ${data[key].venue.city}, ${data[key].venue.region}`)
-                console.log(`Date: ${data[key].datetime}`)
+                console.log(formatDate);
                 console.log("\n");
 
                 fs.appendFile("log.txt", "Band: " + input + "\nVenue: " + data[key].venue.name + "\nLocation: " + data[key].venue.city + "," + data[key].venue.region + "\nDate: " + data[key].datetime + "\n\n", function (err) {
@@ -209,6 +216,10 @@ function doWhatItSays() {
 
             case "movie-this":
                 movieThis(input);
+                break;
+
+            default:
+                console.log("Cannot read from file");
                 break;
         }
     })
