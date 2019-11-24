@@ -59,6 +59,12 @@ All of these commands also print the same results the user sees to log.txt.
 * [Node-Spotify-API](https://www.npmjs.com/package/node-spotify-api)
 * [Dotenv](https://www.npmjs.com/package/dotenv)
 
+## Program Flow
+
+Here is a representation of the logical flow of the program.
+
+![draw.io flow](assets/examples/drawio.jpg)
+
 ## Author
 
 * Jerard Gonzalez - [GitHub](https://github.com/onieronaut)
